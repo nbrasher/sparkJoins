@@ -1,0 +1,8 @@
+# IDE
+.vscode/
+
+# Builds
+target/
+
+# Data
+*.csv
