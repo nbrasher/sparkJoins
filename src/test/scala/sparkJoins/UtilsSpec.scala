@@ -8,6 +8,9 @@ class UtilSpec extends AnyFunSpec {
         it ("should handle whitespace and uppercase") {
             assert(MatchingUtils.tldPrefix("   Google.com ") == Some("google"))
         }
+        it ("should handle malformed strings") {
+            assert(MatchingUtils.tldPrefix(".com") == None)
+        }
     }
     describe("genBlockingKeys") {
         it ("Should generate blocking keys of length 4") {

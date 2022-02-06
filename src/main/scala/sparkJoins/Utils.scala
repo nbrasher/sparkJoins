@@ -5,7 +5,10 @@ object MatchingUtils {
         if (s == null) {
             None
         } else {
-            s.strip().toLowerCase().split('.').headOption
+            s.strip().toLowerCase().split('.').head match {
+                case "" => None
+                case s => Some(s)
+            }
         }
     }
 
