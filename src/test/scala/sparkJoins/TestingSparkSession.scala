@@ -1,13 +1,8 @@
 package sparkJoins
 
-import java.util.Properties
-
-import org.apache.log4j.PropertyConfigurator
 import org.apache.spark.SparkContext
-import org.apache.spark.sql.{DataFrame, SparkSession, SQLContext}
+import org.apache.spark.sql.{SparkSession, SQLContext}
 import org.scalatest._
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{StructField, StructType}
 
 trait TestingSparkSession extends BeforeAndAfterAll {
   self: Suite =>
@@ -15,32 +10,10 @@ trait TestingSparkSession extends BeforeAndAfterAll {
   lazy val spark: SparkSession = TestingSparkSession.sparkSingleton
   lazy val sc: SparkContext = spark.sparkContext
   lazy val sqlContext: SQLContext = spark.sqlContext
-
-  def mkDf(data: Seq[Row], types: List[StructField]): DataFrame =
-    spark.createDataFrame(sc.parallelize(data), StructType(types))
 }
 
 object TestingSparkSession {
-
-  /** config a log4j properties used for testsuite.
-    * Copied from org.apache.spark.utils.Util because it private.
-    */
-  def configTestLog4j(levelOther: String, levelMe: String): Unit = {
-    val pro = new Properties()
-    pro.put("log4j.rootLogger", s"$levelOther, console")
-    pro.put("log4j.appender.console", "org.apache.log4j.ConsoleAppender")
-    pro.put("log4j.appender.console.valor", "System.err")
-    pro.put("log4j.appender.console.layout", "org.apache.log4j.PatternLayout")
-    pro.put(
-      "log4j.appender.console.layout.ConversionPattern",
-      "%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n"
-    ) // scalastyle:ignore regex
-    pro.put(s"log4j.logger.${this.getClass.getPackage.getName}", levelMe)
-    PropertyConfigurator.configure(pro)
-  }
-
   lazy val sparkSingleton: SparkSession = {
-    configTestLog4j("OFF", "OFF")
     SparkSession
       .builder()
       .config("spark.executor.memory", "512mb")
@@ -48,5 +21,4 @@ object TestingSparkSession {
       .master("local[4]")
       .getOrCreate()
   }
-
 }
