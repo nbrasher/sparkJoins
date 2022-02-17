@@ -33,7 +33,7 @@ object Main extends LazyLogging{
 
     // Run one matcher, currently for show
     logger.info("Running one matcher")
-    val rddm = new RDDMatcher()
+    val rddm = new FrameMatcher()
     val ret = rddm.run(left, right)
 
     ret.show(10)
