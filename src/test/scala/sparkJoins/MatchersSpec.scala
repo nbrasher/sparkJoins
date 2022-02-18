@@ -11,14 +11,16 @@ class MatchersSpec extends AnyFunSpec with TestingSparkSession {
         (1, "Tesla", "tesla.com"),
         (2, "SpaceX", "spacex.com"),
         (3, "nonmatch", "nothing.com"),
-        (7, "Close", "close.com")
+        (4, "Close", "close.com"),
+        (5, "Patch", "patch.io"),
     ).toDF("id1", "name", "domain")
 
     val right = Seq(
-        (4, "Tesla", "tesla.com"),
-        (5, "SpaceX", "spacex.com"),
-        (6, "Nonsense", "nonsense.com"),
-        (8, "closer", "closer.com")
+        (6, "Tesla", "tesla.com"),
+        (7, "SpaceX", "spacex.com"),
+        (8, "Nonsense", "nonsense.com"),
+        (9, "closer", "closer.com"),
+        (10, "Patch", "getpatch.com"),
     ).toDF("id2", "name", "domain")
 
     val rddm = new RDDMatcher()
@@ -34,7 +36,7 @@ class MatchersSpec extends AnyFunSpec with TestingSparkSession {
         it ("should only have matches remaining") {
             assert(res.count() === 2)
             val expectedLeft = Set(1, 2)
-            val expectedRight = Set(4, 5)
+            val expectedRight = Set(6, 7)
 
             leftIds.foreach { lid => assert(expectedLeft.contains(lid)) }
             rightIds.foreach { rid => assert( expectedRight.contains(rid)) }
@@ -49,9 +51,9 @@ class MatchersSpec extends AnyFunSpec with TestingSparkSession {
         val rightIds = res.select("id2").as[Int].collect().toSet
 
         it ("should only have matches remaining") {
-            assert(res.count() === 3)
-            val expectedLeft = Set(1, 2, 7)
-            val expectedRight = Set(4, 5, 8)
+            assert(res.count() === 4)
+            val expectedLeft = Set(1, 2, 4, 5)
+            val expectedRight = Set(6, 7, 9, 10)
 
             leftIds.foreach { lid => assert(expectedLeft.contains(lid)) }
             rightIds.foreach { rid => assert( expectedRight.contains(rid)) }

@@ -18,6 +18,4 @@ object MatchingUtils {
             case Some(s) => s.sliding(window).take(numTake).toSeq
         }
     }
-
-    def genSimple(s: String) = { s.sliding(4).take(5).toSeq }
 }

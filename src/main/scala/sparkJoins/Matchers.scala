@@ -17,14 +17,15 @@ class RDDMatcher extends BaseMatcher {
 }
 
 class FrameMatcher extends BaseMatcher {
-    val blockUdf = udf(MatchingUtils.genSimple(_))
+    val tldUdf = udf(MatchingUtils.tldPrefix(_))
+    val blockUdf = udf(MatchingUtils.genBlockingKey(_, 4, 5))
     def run (left: DataFrame, right: DataFrame): DataFrame = {
-        val leftBlocked = left.withColumn("blockingKeys", blockUdf(col("domain"))).select(
+        val leftBlocked = left.withColumn("blockingKeys", blockUdf(tldUdf(col("domain")))).select(
             col("id1"), col("name"), col("domain"), explode(col("blockingKeys"))
         )
         leftBlocked.cache()
 
-        val rightBlocked = right.withColumn("blockingKeys", blockUdf(col("domain"))).select(
+        val rightBlocked = right.withColumn("blockingKeys", blockUdf(tldUdf(col("domain")))).select(
             col("id2"), col("name"), col("domain"), explode(col("blockingKeys"))
         )
         rightBlocked.cache()
