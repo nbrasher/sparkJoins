@@ -13,7 +13,7 @@ class MatchersSpec extends AnyFunSpec with TestingSparkSession {
         (3, "nonmatch", "nothing.com"),
         (4, "Close", "close.com"),
         (5, "Patch", "patch.io"),
-    ).toDF("id1", "name", "domain")
+    ).toDF("id", "name", "domain")
 
     val right = Seq(
         (6, "Tesla", "tesla.com"),
@@ -21,32 +21,31 @@ class MatchersSpec extends AnyFunSpec with TestingSparkSession {
         (8, "Nonsense", "nonsense.com"),
         (9, "closer", "closer.com"),
         (10, "Patch", "getpatch.com"),
-    ).toDF("id2", "name", "domain")
+    ).toDF("id", "name", "domain")
 
-    val rddm = new RDDMatcher()
     val dfm = new FrameMatcher()
+    val bdfm = new BroadcastFrameMatcher()
 
-    describe("test RDD matcher") {
-        val res = rddm.run(left, right)
+    describe("test dataframe macher") {
+        val res = dfm.run(left, right)
 
         // The .as[Int] makes these Set[Int] rather than Set[spark.sql.Row]
         val leftIds = res.select("id1").as[Int].collect().toSet
         val rightIds = res.select("id2").as[Int].collect().toSet
 
         it ("should only have matches remaining") {
-            assert(res.count() === 2)
-            val expectedLeft = Set(1, 2)
-            val expectedRight = Set(6, 7)
+            assert(res.count() === 4)
+            val expectedLeft = Set(1, 2, 4, 5)
+            val expectedRight = Set(6, 7, 9, 10)
 
             leftIds.foreach { lid => assert(expectedLeft.contains(lid)) }
             rightIds.foreach { rid => assert( expectedRight.contains(rid)) }
-        }
+        }        
     }
 
-    describe("test dataframe macher") {
-        val res = dfm.run(left, right)
+    describe("test dataframe macher with a broadcast join") {
+        val res = bdfm.run(left, right)
 
-        // The .as[Int] makes these Set[Int] rather than Set[spark.sql.Row]
         val leftIds = res.select("id1").as[Int].collect().toSet
         val rightIds = res.select("id2").as[Int].collect().toSet
 

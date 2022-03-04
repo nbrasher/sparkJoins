@@ -21,12 +21,12 @@ object Main extends LazyLogging{
 
     // Split data frame
     val left = df.select(
-      col("id1"),
+      col("id1").as("id"),
       col("name1").as("name"),
       col("domain1").as("domain"), 
     )
     val right = df.select(
-      col("id2"),
+      col("id2").as("id"),
       col("name2").as("name"),
       col("domain2").as("domain"), 
     )
